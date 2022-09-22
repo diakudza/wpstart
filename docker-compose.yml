@@ -3,7 +3,8 @@ version: '3.1'
 services:
 
   wordpress:
-    image: wordpress
+#    image: wordpress
+    image: wpdiaries/wordpress-xdebug:6.0.1-php8.1-apache
     depends_on:
       - db
     restart: always
@@ -14,8 +15,12 @@ services:
       WORDPRESS_DB_USER: exampleuser
       WORDPRESS_DB_PASSWORD: examplepass
       WORDPRESS_DB_NAME: exampledb
+
+      XDEBUG_CONFIG: start_with_request=yes client_host=host.docker.internal client_port=9000
     volumes:
       - .:/var/www/html
+    networks:
+      - wp-network
   db:
     image: mysql:5.7
     restart: always
@@ -27,6 +32,11 @@ services:
       MYSQL_RANDOM_ROOT_PASSWORD: '1'
     volumes:
       - db:/var/lib/mysql
+    networks:
+      - wp-network
 volumes:
   db:
   wp-content:
+networks:
+  wp-network:
+    driver: bridge
